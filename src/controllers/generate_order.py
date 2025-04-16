@@ -17,16 +17,18 @@ def generate_order(product_id, customer_id, quantity, employee_id):
     if product is None:
         raise Exception('Produto não encontrado')
 
-    if product['unitsinstock'] - quantity < 0:
+    productUnits = product['unitsinstock'] - quantity;
+    
+    if productUnits < 0:
         raise Exception('Produto não disponível')
 
     if is_employee_valid(employee_id) is False:
         raise Exception("Funcionario não disponível")
     
-    update_product_units_in_stock(product_id, quantity)
+    update_product_units_in_stock(product_id, productUnits)
 
     order = create_order(customer, employee_id)
     save_order(order)
 
-    order_details = create_order_details(order['orderid'], product, product['unitsinstock'] - quantity)
+    order_details = create_order_details(order['orderid'], product, productUnits)
     save_order_details(order_details)

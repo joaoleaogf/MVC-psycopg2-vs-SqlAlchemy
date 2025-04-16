@@ -21,8 +21,6 @@ class Order(Base):
     shippostalcode = Column(String)
     shipcountry = Column(String)
     shipperid = Column(Integer)
-    qtdprodutos = Column(Integer)
-    maisdesconto = Column(Integer)
 
     employee = relationship("Employee", back_populates="orders")
     order_details = relationship("OrderDetail", back_populates="order")

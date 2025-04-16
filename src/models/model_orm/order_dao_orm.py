@@ -39,7 +39,7 @@ class OrderDAO:
         session = self.Session()
         try:
             # Assuming orders are already in the database and orderid is autoincremented
-            last_order = session.query(Order).order_by(Order['orderid'].desc()).first()
+            last_order = session.query(Order).order_by(Order.orderid.desc()).first()
             last_id = last_order['orderid'] if last_order else 0
             order_data = {
                 "orderid": last_id + 1,
