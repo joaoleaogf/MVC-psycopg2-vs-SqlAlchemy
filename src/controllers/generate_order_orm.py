@@ -31,7 +31,8 @@ def generate_order_orm(product_id, customer_id, quantity, employee_id):
     product_dao.update_product_units_in_stock(product_id, quantity)
 
     order = order_dao.create_order(customer, employee_id)
+    print(f"Pedido gerado: {order.orderid} - {order.customerid} - {order.employeeid}")
     order_dao.save_order(order)
 
-    order_details = create_order_details(order['orderid'], product, quantity)
+    order_details = create_order_details(order.orderid, product, quantity)
     order_details_dao.save_order_details(order_details)

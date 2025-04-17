@@ -12,49 +12,39 @@ class OrderDAO:
         Base.metadata.create_all(self.engine)
         self.Session = sessionmaker(bind=self.engine)
 
-    def save_order(self, order_data):
+    def save_order(self, order: Order):
         session = self.Session()
         try:
-            order = Order(
-                orderid=order_data["orderid"],
-                customerid=order_data["customerid"],
-                employeeid=order_data["employeeid"],
-                orderdate=datetime.strptime(order_data["orderdate"], '%Y-%m-%d'),
-                requireddate=datetime.strptime(order_data["required_date"], '%Y-%m-%d'),
-                freight=order_data["freight"],
-                shipname=order_data["shipname"],
-                shipaddress=order_data["shipaddress"],
-                shipcity=order_data["shipcity"],
-                shipcountry=order_data["shipcountry"]
-            )
-            session.add(order)
+            # Merge the detached order into the new session
+            merged_order = session.merge(order)  
             session.commit()
+            return merged_order  # Return the persisted version
         except Exception as e:
             session.rollback()
-            print("save_order", e)
+            print(f"save_order error: {e}")
+            raise
         finally:
             session.close()
 
     def create_order(self, customer, employee_id):
         session = self.Session()
         try:
-            # Assuming orders are already in the database and orderid is autoincremented
             last_order = session.query(Order).order_by(Order.orderid.desc()).first()
-            last_id = last_order['orderid'] if last_order else 0
-            order_data = {
-                "orderid": last_id + 1,
-                "customerid": customer["customerid"],
-                "employeeid": employee_id,
-                "orderdate": "2024-03-25",
-                "required_date": "2024-04-25",
-                "freight": 10,
-                "shipname": customer["contactname"],
-                "shipaddress": customer["address"],
-                "shipcity": customer["city"],
-                "shipcountry": customer["country"]
-            }
-            self.save_order(order_data)
-            return order_data
+            last_id = last_order.orderid if last_order else 0  # Fixed: access attribute directly, not as dictionary
+            
+            order = Order(
+                orderid=last_id + 1,
+                customerid=customer["customerid"],
+                employeeid=employee_id,
+                orderdate=datetime.strptime("2024-03-25", '%Y-%m-%d'),
+                requireddate=datetime.strptime("2024-04-25", '%Y-%m-%d'),
+                freight=10,
+                shipname=customer["contactname"],
+                shipaddress=customer["address"],
+                shipcity=customer["city"],
+                shipcountry=customer["country"]
+            )
+            return order
         except Exception as e:
             session.rollback()
             print("create_order", e)
