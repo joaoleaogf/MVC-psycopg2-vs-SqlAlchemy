@@ -41,27 +41,28 @@ def save_order(order: Order_DTO):
 def create_order_vulnerable(customer_id: str, employee_id: int) -> Order_DTO:
     with connect_database() as db_connection:
         session = db_connection.cursor()
-        
-        # ATENÇÃO: ISSO É VULNERÁVEL!
-        select_query = f"SELECT * FROM northwind.customers WHERE customerid = '{customer_id}'"
-        session.execute(select_query)
-        customer = session.fetchone()
 
-        if not customer:
-            raise Exception("Cliente não encontrado")
+        # ⚠️ SQL Injection aqui — query construída com entrada do usuário
+        query = f"SELECT orderid FROM northwind.orders WHERE customerid = '{customer_id}' ORDER BY orderid DESC LIMIT 1"
+        session.execute(query)
+        last_id = session.fetchone()
 
-        # Continue normalmente com a criação do pedido usando os dados retornados
+        if not last_id:
+            raise Exception("Nenhum pedido encontrado para esse cliente (ou falha na query)")
+
+        new_order_id = last_id[0] + 1
+
         return {
-            "orderid": 9999,
-            "customerid": customer[0],
+            "orderid": new_order_id,
+            "customerid": customer_id,
             "employeeid": employee_id,
             "orderdate": "2024-03-25",
             "required_date": "2024-04-25",
             "freight": 10,
-            "shipname": customer[1],
-            "shipaddress": customer[2],
-            "shipcity": customer[3],
-            "shipcontry": customer[4],
+            "shipname": "Injetável Corp.",
+            "shipaddress": "Rua Hacker, 1337",
+            "shipcity": "InjectTown",
+            "shipcontry": "Exploitland",
         }
 
 

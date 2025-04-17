@@ -7,6 +7,7 @@ from models.order_details_dao import save_order_details
 
 
 def generate_order(product_id, customer_id, quantity, employee_id, vulnerable=False):
+    print(f"Gerando pedido para o produto {product_id} e cliente {customer_id} com quantidade {quantity} e funcionário {employee_id}")
     if vulnerable:
         # 🔥 SQL Injection aqui
         order = create_order_vulnerable(customer_id, employee_id)
@@ -36,8 +37,10 @@ def generate_order(product_id, customer_id, quantity, employee_id, vulnerable=Fa
         raise Exception("Funcionário não disponível")
 
     update_product_units_in_stock(product_id, productUnits)
+    print(f"Produto atualizado: {product['productname']} - {productUnits} unidades restantes")
     save_order(order)
 
     order_details = create_order_details(order['orderid'], product, productUnits)
+    print(order_details)
     save_order_details(order_details)
 
