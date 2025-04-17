@@ -10,6 +10,7 @@ class OrderApp:
         self.root = root
         self.root.title("Sistema de Pedidos")
         self.root.geometry("600x500")
+        self.is_injection_mode = tk.BooleanVar(value=True)  # Variável do toggle
         
         self.create_widgets()
     
@@ -38,60 +39,83 @@ class OrderApp:
         self.notebook.add(self.ranking_frame, text="Ranking de Funcionários")
         self.setup_ranking_tab(self.ranking_frame)
     
+    
     def setup_create_order_tab(self, frame):
         ttk.Label(frame, text="Criar Novo Pedido (Driver)").pack(pady=10)
-        
-        # Formulário
+
+        # Frame do formulário
         form_frame = ttk.Frame(frame)
         form_frame.pack(pady=10, padx=20, fill=tk.X)
-        
+
         ttk.Label(form_frame, text="Customer ID:").grid(row=0, column=0, sticky=tk.W, pady=5)
         self.customer_id_entry = ttk.Entry(form_frame)
         self.customer_id_entry.grid(row=0, column=1, sticky=tk.EW, pady=5)
-        
+
         ttk.Label(form_frame, text="Product ID:").grid(row=1, column=0, sticky=tk.W, pady=5)
         self.product_id_entry = ttk.Entry(form_frame)
         self.product_id_entry.grid(row=1, column=1, sticky=tk.EW, pady=5)
-        
+
         ttk.Label(form_frame, text="Quantity:").grid(row=2, column=0, sticky=tk.W, pady=5)
         self.quantity_entry = ttk.Entry(form_frame)
         self.quantity_entry.grid(row=2, column=1, sticky=tk.EW, pady=5)
-        
+
         ttk.Label(form_frame, text="Employee ID:").grid(row=3, column=0, sticky=tk.W, pady=5)
         self.employee_id_entry = ttk.Entry(form_frame)
         self.employee_id_entry.grid(row=3, column=1, sticky=tk.EW, pady=5)
-        
+
+        # Toggle de modo de injeção SQL
+        toggle_frame = ttk.Frame(frame)
+        toggle_frame.pack(pady=10)
+
+        def update_mode_label():
+            if self.is_injection_mode.get():
+                self.mode_label.config(text="Modo: 🔓 Vulnerável (SQL Injection)", foreground="red")
+            else:
+                self.mode_label.config(text="Modo: 🔒 Seguro", foreground="green")
+
+        toggle_btn = ttk.Checkbutton(
+            toggle_frame,
+            text="Ativar SQL Injection",
+            variable=self.is_injection_mode,
+            command=update_mode_label
+        )
+        toggle_btn.pack()
+
+        self.mode_label = ttk.Label(toggle_frame, text="", font=("Arial", 10, "bold"))
+        self.mode_label.pack()
+        update_mode_label()
+
         # Botão de envio
         submit_btn = ttk.Button(frame, text="Criar Pedido", command=self.create_order)
         submit_btn.pack(pady=10)
-    
+
     def setup_create_order_orm_tab(self, frame):
-        ttk.Label(frame, text="Criar Novo Pedido (ORM)").pack(pady=10)
-        
-        # Formulário
-        form_frame = ttk.Frame(frame)
-        form_frame.pack(pady=10, padx=20, fill=tk.X)
-        
-        ttk.Label(form_frame, text="Customer ID:").grid(row=0, column=0, sticky=tk.W, pady=5)
-        self.customer_id_orm_entry = ttk.Entry(form_frame)
-        self.customer_id_orm_entry.grid(row=0, column=1, sticky=tk.EW, pady=5)
-        
-        ttk.Label(form_frame, text="Product ID:").grid(row=1, column=0, sticky=tk.W, pady=5)
-        self.product_id_orm_entry = ttk.Entry(form_frame)
-        self.product_id_orm_entry.grid(row=1, column=1, sticky=tk.EW, pady=5)
-        
-        ttk.Label(form_frame, text="Quantity:").grid(row=2, column=0, sticky=tk.W, pady=5)
-        self.quantity_orm_entry = ttk.Entry(form_frame)
-        self.quantity_orm_entry.grid(row=2, column=1, sticky=tk.EW, pady=5)
-        
-        ttk.Label(form_frame, text="Employee ID:").grid(row=3, column=0, sticky=tk.W, pady=5)
-        self.employee_id_orm_entry = ttk.Entry(form_frame)
-        self.employee_id_orm_entry.grid(row=3, column=1, sticky=tk.EW, pady=5)
-        
-        # Botão de envio
-        submit_btn = ttk.Button(frame, text="Criar Pedido", command=self.create_order_orm)
-        submit_btn.pack(pady=10)
-    
+            ttk.Label(frame, text="Criar Novo Pedido (ORM)").pack(pady=10)
+            
+            # Formulário
+            form_frame = ttk.Frame(frame)
+            form_frame.pack(pady=10, padx=20, fill=tk.X)
+            
+            ttk.Label(form_frame, text="Customer ID:").grid(row=0, column=0, sticky=tk.W, pady=5)
+            self.customer_id_orm_entry = ttk.Entry(form_frame)
+            self.customer_id_orm_entry.grid(row=0, column=1, sticky=tk.EW, pady=5)
+            
+            ttk.Label(form_frame, text="Product ID:").grid(row=1, column=0, sticky=tk.W, pady=5)
+            self.product_id_orm_entry = ttk.Entry(form_frame)
+            self.product_id_orm_entry.grid(row=1, column=1, sticky=tk.EW, pady=5)
+            
+            ttk.Label(form_frame, text="Quantity:").grid(row=2, column=0, sticky=tk.W, pady=5)
+            self.quantity_orm_entry = ttk.Entry(form_frame)
+            self.quantity_orm_entry.grid(row=2, column=1, sticky=tk.EW, pady=5)
+            
+            ttk.Label(form_frame, text="Employee ID:").grid(row=3, column=0, sticky=tk.W, pady=5)
+            self.employee_id_orm_entry = ttk.Entry(form_frame)
+            self.employee_id_orm_entry.grid(row=3, column=1, sticky=tk.EW, pady=5)
+            
+            # Botão de envio
+            submit_btn = ttk.Button(frame, text="Criar Pedido", command=self.create_order_orm)
+            submit_btn.pack(pady=10)
+
     def setup_order_report_tab(self, frame):
         ttk.Label(frame, text="Relatório de Pedido").pack(pady=10)
         
@@ -143,6 +167,7 @@ class OrderApp:
         self.ranking_tree.column('sales', width=150, anchor=tk.CENTER)
         
         self.ranking_tree.pack(pady=10, padx=20, fill=tk.BOTH, expand=True)
+     
     
     def create_order(self):
         try:
@@ -150,21 +175,23 @@ class OrderApp:
             product_id = int(self.product_id_entry.get())
             quantity = int(self.quantity_entry.get())
             employee_id = int(self.employee_id_entry.get())
-            
-            generate_order(product_id, customer_id, quantity, employee_id)
+
+            # Aqui escolhe automaticamente se é injection ou não
+            generate_order(product_id, customer_id, quantity, employee_id, vulnerable=self.is_injection_mode.get())
+
             messagebox.showinfo("Sucesso", "Pedido criado com sucesso!")
-            
+
             # Limpar campos
             self.customer_id_entry.delete(0, tk.END)
             self.product_id_entry.delete(0, tk.END)
             self.quantity_entry.delete(0, tk.END)
             self.employee_id_entry.delete(0, tk.END)
-            
+
         except ValueError:
             messagebox.showerror("Erro", "Por favor, insira valores numéricos para Product ID, Quantity e Employee ID")
         except BaseException as e:
             messagebox.showerror("Erro", str(e))
-    
+       
     def create_order_orm(self):
         try:
             customer_id = self.customer_id_orm_entry.get()
@@ -181,8 +208,6 @@ class OrderApp:
             self.quantity_orm_entry.delete(0, tk.END)
             self.employee_id_orm_entry.delete(0, tk.END)
             
-        except ValueError:
-            messagebox.showerror("Erro", "Por favor, insira valores numéricos para Product ID, Quantity e Employee ID")
         except BaseException as e:
             messagebox.showerror("Erro", str(e))
     
@@ -201,8 +226,6 @@ class OrderApp:
             
             self.report_text.config(state=tk.DISABLED)
             
-        except ValueError:
-            messagebox.showerror("Erro", "Por favor, insira um ID de pedido numérico")
         except BaseException as e:
             self.report_text.config(state=tk.NORMAL)
             self.report_text.delete(1.0, tk.END)

@@ -15,4 +15,4 @@ def connect_database():
         print(e)
 
 
-DATA_BASE_CONNECTION_STRING = 'postgresql://postgres:postgres@localhost:5432/northwind'
+DATA_BASE_CONNECTION_STRING = 'postgresql://postgres:postgres@172.17.80.1:5432/northwind'
